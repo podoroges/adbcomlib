@@ -1,20 +1,27 @@
+// 14Jun2016 added CExcel->SaveAsTab
 // 07Jul2015 added Bold property for CRange
 // 17Feb2015 added CopySheet, Sheet[].Select()
 // 23Jan2015 added CRange, FontSize, Alignment
 // 14-Oct added Strike and BgColor
 // 5-OCT Visible property added
 #include "olectrls.hpp"
-//#pragma comment(lib, "olectrls.lib")
+
+
+// https://msdn.microsoft.com/en-us/library/office/ff198017.aspx
+typedef enum XlFileFormat
+{
+  xlText = -4158
+} XlFileFormat;
 
 typedef enum XlBordersIndex
 {
   xlInsideHorizontal = 12,
   xlInsideVertical = 11,
-  xlDiagonalDown = 5, 
-  xlDiagonalUp = 6, 
+  xlDiagonalDown = 5,
+  xlDiagonalUp = 6,
   xlEdgeBottom = 9,
   xlEdgeLeft = 7,
-  xlEdgeRight = 10, 
+  xlEdgeRight = 10,
   xlEdgeTop = 8
 } XlBordersIndex;
 
@@ -22,9 +29,9 @@ typedef enum XlLineStyle
 {
   xlContinuous = 1, 
   xlDash = 0xFFFFEFED, 
-  xlDashDot = 4, 
+  xlDashDot = 4,
   xlDashDotDot = 5, 
-  xlDot = 0xFFFFEFEA, 
+  xlDot = 0xFFFFEFEA,
   xlDouble = 0xFFFFEFE9,
   xlSlantDashDot = 13, 
   xlLineStyleNone = 0xFFFFEFD2
@@ -48,16 +55,16 @@ typedef enum Constants
   xlDistributed = 0xFFFFEFEB, 
   xlDoubleAccounting = 5, 
   xlFixedValue = 1, 
-  xlFormats = 0xFFFFEFE6, 
+  xlFormats = 0xFFFFEFE6,
   xlGray16 = 17, 
   xlGray8 = 18, 
   xlGrid = 15, 
   xlHigh = 0xFFFFEFE1, 
   xlInside = 2, 
   xlJustify = 0xFFFFEFDE, 
-  xlLightDown = 13, 
+  xlLightDown = 13,
   xlLightHorizontal = 11, 
-  xlLightUp = 14, 
+  xlLightUp = 14,
   xlLightVertical = 12, 
   xlLow = 0xFFFFEFDA, 
   xlManual = 0xFFFFEFD9, 
@@ -81,16 +88,16 @@ typedef enum Constants
   xlSingleAccounting = 4, 
   xlSolid = 1, 
   xlSquare = 1,
-  xlStar = 5, 
+  xlStar = 5,
   xlStError = 4, 
   xlToolbarButton = 2, 
   xlTriangle = 3, 
   xlGray25 = 0xFFFFEFE4, 
   xlGray50 = 0xFFFFEFE3, 
   xlGray75 = 0xFFFFEFE2, 
-  xlBottom = 0xFFFFEFF5, 
+  xlBottom = 0xFFFFEFF5,
   xlLeft = 0xFFFFEFDD, 
-  xlRight = 0xFFFFEFC8, 
+  xlRight = 0xFFFFEFC8,
   xlTop = 0xFFFFEFC0, 
   xl3DBar = 0xFFFFEFFD, 
   xl3DSurface = 0xFFFFEFF9, 
@@ -114,16 +121,16 @@ typedef enum Constants
   xlMixedAuthorizedScript = 4, 
   xlVisualCursor = 2, 
   xlLogicalCursor = 1, 
-  xlSystem = 1, 
+  xlSystem = 1,
   xlPartial = 3, 
   xlHindiNumerals = 3, 
   xlBidiCalendar = 3, 
   xlGregorian = 2, 
   xlComplete = 4, 
   xlScale = 3, 
-  xlClosed = 3, 
+  xlClosed = 3,
   xlColor1 = 7, 
-  xlColor2 = 8, 
+  xlColor2 = 8,
   xlColor3 = 9, 
   xlConstants = 2, 
   xlContents = 2, 
@@ -147,16 +154,16 @@ typedef enum Constants
   xlAdd = 2, 
   xlDebugCodePane = 13, 
   xlDesktop = 9, 
-  xlDirect = 1, 
+  xlDirect = 1,
   xlDivide = 5, 
   xlDoubleClosed = 5, 
   xlDoubleOpen = 4, 
   xlDoubleQuote = 1, 
   xlEntireChart = 20, 
   xlExcelMenus = 1, 
-  xlExtended = 3, 
+  xlExtended = 3,
   xlFill = 5, 
-  xlFirst = 0, 
+  xlFirst = 0,
   xlFloating = 5, 
   xlFormula = 5, 
   xlGeneral = 1, 
@@ -180,16 +187,16 @@ typedef enum Constants
   xlNoDocuments = 3, 
   xlOpen = 2, 
   xlOutside = 3, 
-  xlReference = 4, 
+  xlReference = 4,
   xlSemiautomatic = 2, 
   xlShort = 1, 
   xlSingleQuote = 2, 
   xlStrict = 2, 
   xlSubtract = 3, 
   xlTextBox = 16, 
-  xlTiled = 1, 
+  xlTiled = 1,
   xlTitleBar = 8, 
-  xlToolbar = 1, 
+  xlToolbar = 1,
   xlVisible = 12, 
   xlWatchPane = 11, 
   xlWide = 3, 
@@ -477,8 +484,13 @@ class CExcel{
       Ex.OlePropertyGet("ActiveWindow").OlePropertySet("SplitRow", 1);
       Ex.OlePropertyGet("ActiveWindow").OlePropertySet("FreezePanes", 1);
     }
-    
+
   int CloseExcelOnDelete;
+
+  void SaveAsTab(AnsiString f1){
+    Ex.OlePropertySet("DisplayAlerts",0);
+    Ex.OlePropertyGet("ActiveWorkbook").OleProcedure("Saveas",StringToOleStr(f1),xlText);
+  }
 
 
   CExcel(AnsiString _fname, AnsiString _password=""){
