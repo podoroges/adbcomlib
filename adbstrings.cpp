@@ -80,7 +80,7 @@ AnsiString b64_encode(char *clrstr, int cnt) {
     len = 0;
     for(i=0; i<3; i++) {
      in[i] = (unsigned char) clrstr[j];
-     if(clrstr[j]) {
+     if(j<cnt) {
         len++; j++;
       }
       else in[i] = 0;
