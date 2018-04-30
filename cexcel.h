@@ -1,3 +1,5 @@
+// 30Apr2018 addex CExcel->RunMacro
+// 19Apr2017 added Sheet[].AddRow
 // 14Jun2016 added CExcel->SaveAsTab
 // 07Jul2015 added Bold property for CRange
 // 17Feb2015 added CopySheet, Sheet[].Select()
@@ -61,7 +63,7 @@ typedef enum Constants
   xlGrid = 15, 
   xlHigh = 0xFFFFEFE1, 
   xlInside = 2, 
-  xlJustify = 0xFFFFEFDE, 
+  xlJustify = 0xFFFFEFDE,
   xlLightDown = 13,
   xlLightHorizontal = 11, 
   xlLightUp = 14,
@@ -104,7 +106,7 @@ typedef enum Constants
   xlBar = 2, 
   xlColumn = 3, 
   xlCombination = 0xFFFFEFF1, 
-  xlCustom = 0xFFFFEFEE, 
+  xlCustom = 0xFFFFEFEE,
   xlDefaultAutoFormat = 0xFFFFFFFF, 
   xlMaximum = 2, 
   xlMinimum = 4, 
@@ -147,7 +149,7 @@ typedef enum Constants
   xl3DEffects1 = 13, 
   xl3DEffects2 = 14, 
   xlAbove = 0, 
-  xlAccounting1 = 4, 
+  xlAccounting1 = 4,
   xlAccounting2 = 5, 
   xlAccounting3 = 6, 
   xlAccounting4 = 17, 
@@ -190,7 +192,7 @@ typedef enum Constants
   xlReference = 4,
   xlSemiautomatic = 2, 
   xlShort = 1, 
-  xlSingleQuote = 2, 
+  xlSingleQuote = 2,
   xlStrict = 2, 
   xlSubtract = 3, 
   xlTextBox = 16, 
@@ -405,6 +407,10 @@ class CExcel{
       sheet.OlePropertyGet("Columns",StringToOleStr((AnsiString)char(c)+":"+char(c))).OlePropertyGet("EntireColumn").OleProcedure("AutoFit");
     }
 
+    void AddRow(int j){
+      sheet.OlePropertyGet ("Rows", j). OleProcedure ("Insert");
+    }
+
     CSheet(int i,Variant Ex){
       sheet = Ex.OlePropertyGet("ActiveWorkbook").OlePropertyGet("Sheets", i);
     }
@@ -465,9 +471,9 @@ class CExcel{
     Ex.OlePropertyGet("Workbooks").OlePropertyGet("Item", 2).OleProcedure("Close");
   }
 
-  /*
-  void AddMacro(AnsiString st){
-    ShowMessage(Ex.OlePropertyGet("VBE"));
+
+  void RunMacro(AnsiString st){
+    Ex.OleProcedure("Run",StringToOleStr(st));
 /*    Variant v2 = v1.OlePropertyGet("VBProject");
     ShowMessage(v2.OlePropertyGet("Name"));
 
@@ -478,7 +484,7 @@ class CExcel{
     VBComp.OlePropertyGet("CodeModule").OleProcedure("AddFromString", StringToOleStr(st));
       */
 
- // }
+   }
     void Freeze11(){
       Ex.OlePropertyGet("ActiveWindow").OlePropertySet("SplitColumn", 1);
       Ex.OlePropertyGet("ActiveWindow").OlePropertySet("SplitRow", 1);
