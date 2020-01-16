@@ -1,11 +1,19 @@
-// 30Apr2018 addex CExcel->RunMacro
-// 19Apr2017 added Sheet[].AddRow
-// 14Jun2016 added CExcel->SaveAsTab
-// 07Jul2015 added Bold property for CRange
-// 17Feb2015 added CopySheet, Sheet[].Select()
-// 23Jan2015 added CRange, FontSize, Alignment
-// 14-Oct added Strike and BgColor
-// 5-OCT Visible property added
+/*
+	cExcel.h by Podoroges
+	Small dirty header to work with excel files from BCB
+	https://github.com/podoroges/adbcomlib
+	
+	16Jan2020 added unicode support (StringToOleStr replaced by ws in SetStr)
+	30Apr2018 added CExcel->RunMacro
+	19Apr2017 added Sheet[].AddRow
+	14Jun2016 added CExcel->SaveAsTab
+	07Jul2015 added Bold property for CRange
+	17Feb2015 added CopySheet, Sheet[].Select()
+	23Jan2015 added CRange, FontSize, Alignment
+	14-Oct added Strike and BgColor
+	5-OCT Visible property added
+*/
+
 #include "olectrls.hpp"
 
 
@@ -29,7 +37,7 @@ typedef enum XlBordersIndex
 
 typedef enum XlLineStyle
 {
-  xlContinuous = 1, 
+	xlContinuous = 1,
   xlDash = 0xFFFFEFED, 
   xlDashDot = 4,
   xlDashDotDot = 5, 
@@ -50,7 +58,7 @@ typedef enum Constants
   xlCenter = 0xFFFFEFF4,
   xlChecker = 9, 
   xlCircle = 8, 
-  xlCorner = 2,
+	xlCorner = 2,
   xlCrissCross = 16, 
   xlCross = 4, 
   xlDiamond = 2, 
@@ -71,7 +79,7 @@ typedef enum Constants
   xlLow = 0xFFFFEFDA, 
   xlManual = 0xFFFFEFD9, 
   xlMinusValues = 3, 
-  xlModule = 0xFFFFEFD3, 
+	xlModule = 0xFFFFEFD3,
   xlNextToAxis = 4, 
   xlNone = 0xFFFFEFD2, 
   xlNotes = 0xFFFFEFD0, 
@@ -92,7 +100,7 @@ typedef enum Constants
   xlSquare = 1,
   xlStar = 5,
   xlStError = 4, 
-  xlToolbarButton = 2, 
+	xlToolbarButton = 2,
   xlTriangle = 3, 
   xlGray25 = 0xFFFFEFE4, 
   xlGray50 = 0xFFFFEFE3, 
@@ -113,7 +121,7 @@ typedef enum Constants
   xlOpaque = 3, 
   xlTransparent = 2, 
   xlBidi = 0xFFFFEC78, 
-  xlLatin = 0xFFFFEC77, 
+	xlLatin = 0xFFFFEC77,
   xlContext = 0xFFFFEC76, 
   xlLTR = 0xFFFFEC75, 
   xlRTL = 0xFFFFEC74, 
@@ -134,7 +142,7 @@ typedef enum Constants
   xlColor1 = 7, 
   xlColor2 = 8,
   xlColor3 = 9, 
-  xlConstants = 2, 
+	xlConstants = 2,
   xlContents = 2, 
   xlBelow = 1, 
   xlCascade = 7, 
@@ -155,7 +163,7 @@ typedef enum Constants
   xlAccounting4 = 17, 
   xlAdd = 2, 
   xlDebugCodePane = 13, 
-  xlDesktop = 9, 
+	xlDesktop = 9,
   xlDirect = 1,
   xlDivide = 5, 
   xlDoubleClosed = 5, 
@@ -176,7 +184,7 @@ typedef enum Constants
   xlLast = 1, 
   xlLastCell = 11, 
   xlList1 = 10, 
-  xlList2 = 11, 
+	xlList2 = 11,
   xlList3 = 12, 
   xlLocalFormat1 = 15, 
   xlLocalFormat2 = 16, 
@@ -197,7 +205,7 @@ typedef enum Constants
   xlSubtract = 3, 
   xlTextBox = 16, 
   xlTiled = 1,
-  xlTitleBar = 8, 
+	xlTitleBar = 8,
   xlToolbar = 1,
   xlVisible = 12, 
   xlWatchPane = 11, 
@@ -215,8 +223,9 @@ typedef enum Constants
 
 
 class CExcel{
-  private:
-  Variant Ex;
+	private:
+	Variant Ex;
+
 
   class CRange{
     private:
@@ -231,7 +240,7 @@ class CExcel{
     public:
     __property int Bold = {read=GetBold,write=SetBold};
 
-    void MergeCells(){
+		void MergeCells(){
     
      range.OlePropertySet("MergeCells",1);
 
@@ -252,7 +261,7 @@ class CExcel{
       range.OlePropertyGet("Borders").OlePropertyGet("Item",xlInsideHorizontal).OlePropertySet("LineStyle", xlContinuous);
     }
 
-    void SetBorder(XlBordersIndex bi,XlLineStyle ls){
+		void SetBorder(XlBordersIndex bi,XlLineStyle ls){
       range.OlePropertyGet("Borders").OlePropertyGet("Item",bi).OlePropertySet("LineStyle", ls);
     }  
 
@@ -264,7 +273,15 @@ class CExcel{
 
   class CCell{
     private:
-    Variant cell;
+		Variant cell;
+	WideString ws(AnsiString st){
+		int cnt = MultiByteToWideChar(1251,0,st.c_str(),st.Length(),NULL,0);
+		WCHAR * wchar = new WCHAR[cnt];
+		MultiByteToWideChar(1251,0,st.c_str(),st.Length(),wchar,cnt);
+		WideString wstr = WideString(wchar,cnt);
+		delete [] wchar;
+		return wstr;
+	}
     void __fastcall SetBold(int value){
       cell.OlePropertyGet("Font").OlePropertySet("Bold",value);
     }
@@ -272,7 +289,7 @@ class CExcel{
       return cell.OlePropertyGet("Font").OlePropertyGet("Bold");
     }
     void __fastcall SetStrike(int value){
-      cell.OlePropertyGet("Font").OlePropertySet("Strikethrough",value);
+			cell.OlePropertyGet("Font").OlePropertySet("Strikethrough",value);
     }
     int __fastcall GetStrike(){
       return cell.OlePropertyGet("Font").OlePropertyGet("Strikethrough");
@@ -292,9 +309,8 @@ class CExcel{
       return (TColor)(int)cell.OlePropertyGet("Interior").OlePropertyGet("Color");
     }
 
-
-    void __fastcall SetStr(AnsiString value){
-      cell.OlePropertySet("Value",StringToOleStr(value));
+		void __fastcall SetStr(AnsiString value){
+			cell.OlePropertySet("Value",ws(value));
     }
     AnsiString __fastcall GetStr(){
       return cell.OlePropertyGet("Value");
